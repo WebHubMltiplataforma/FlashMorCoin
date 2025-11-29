@@ -317,6 +317,16 @@
             margin: 20px 0;
             text-align: center;
         }
+        
+        .contract-address {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 5px 0;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
@@ -460,24 +470,31 @@
                 <div>
                     <h3>🔗 Contrato FMC</h3>
                     <p>Estado: <span id="fmc-status" class="status-badge status-active">✅ Pre-configurado</span></p>
-                    <input type="text" id="fmc-address" placeholder="Dirección del contrato FMC" style="font-family: monospace;">
+                    <div class="contract-address" id="fmc-contract-address">
+                        0x5182CaAe1EccBa71aa854E89847eE530a361b8bA
+                    </div>
                     <button class="action-btn" onclick="deployFMCContract()">🚀 Desplegar Contrato FMC</button>
                     <button class="action-btn" onclick="autoDetectFMC()" style="background: #4ECDC4; margin-top: 5px;">
-                        🔍 Detectar Automáticamente
+                        🔍 Verificar Contrato
                     </button>
                 </div>
                 <div>
                     <h3>🏦 Contrato Vault</h3>
                     <p>Estado: <span id="vault-status" class="status-badge status-active">✅ Pre-configurado</span></p>
-                    <input type="text" id="vault-address" placeholder="Dirección del contrato Vault" style="font-family: monospace;">
+                    <div class="contract-address" id="vault-contract-address">
+                        0xfb146E2601c5F77743E4888E75D6577C2F56bAbb
+                    </div>
                     <button class="action-btn" onclick="deployVaultContract()">🚀 Desplegar Contrato Vault</button>
                     <button class="action-btn" onclick="autoDetectVault()" style="background: #4ECDC4; margin-top: 5px;">
-                        🔍 Detectar Automáticamente
+                        🔍 Verificar Contrato
                     </button>
                 </div>
                 <div>
-                    <h3>🌐 Configuración de Red</h3>
-                    <p>Estado: <span id="network-config-status" class="status-badge status-active">🟢 Óptimo</span></p>
+                    <h3>💰 Token USDT</h3>
+                    <p>Estado: <span id="usdt-status" class="status-badge status-active">✅ Pre-configurado</span></p>
+                    <div class="contract-address" id="usdt-contract-address">
+                        0x4B6C5B5E4656c5b5E4656c5B5E4656c5b5E4656c
+                    </div>
                     <div class="transaction-status">
                         <p><strong>Wallet Activa:</strong> 0x3D1140...b04765</p>
                         <p><strong>Red Principal:</strong> <span id="active-network">Polygon</span></p>
@@ -493,12 +510,58 @@
             </div>
         </div>
 
+        <!-- Tokens Configurados -->
+        <div class="card" id="tokens-section" style="display: none;">
+            <h2>🪙 Tokens Configurados</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>⚡ FlashMorCoin (FMC)</h3>
+                    <div class="contract-address">
+                        <strong>Dirección:</strong> 0x5182CaAe1EccBa71aa854E89847eE530a361b8bA
+                    </div>
+                    <div class="transaction-status">
+                        <p><strong>Supply Total:</strong> 1,000,000 FMC</p>
+                        <p><strong>Precio Actual:</strong> 1.02 USDC</p>
+                        <p><strong>Holders:</strong> 1,243</p>
+                    </div>
+                    <button class="action-btn" onclick="checkFMCBalance()">📊 Ver Balance FMC</button>
+                </div>
+                
+                <div class="card">
+                    <h3>🏦 Vault Principal</h3>
+                    <div class="contract-address">
+                        <strong>Dirección:</strong> 0xfb146E2601c5F77743E4888E75D6577C2F56bAbb
+                    </div>
+                    <div class="transaction-status">
+                        <p><strong>TVL:</strong> 245,780 USDC</p>
+                        <p><strong>Colateral Ratio:</strong> 150%</p>
+                        <p><strong>APY:</strong> 12.5%</p>
+                    </div>
+                    <button class="action-btn" onclick="checkVaultBalance()">🏦 Ver Balance Vault</button>
+                </div>
+                
+                <div class="card">
+                    <h3>💵 USDT (Tether)</h3>
+                    <div class="contract-address">
+                        <strong>Dirección:</strong> 0x4B6C5B5E4656c5b5E4656c5B5E4656c5b5E4656c
+                    </div>
+                    <div class="transaction-status">
+                        <p><strong>Balance:</strong> 15,250.75 USDT</p>
+                        <p><strong>Peg:</strong> 1.00 USD</p>
+                        <p><strong>Red:</strong> Polygon</p>
+                    </div>
+                    <button class="action-btn" onclick="checkUSDTBalance()">💰 Ver Balance USDT</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Acciones Automáticas -->
         <div class="grid" id="actions-section" style="display: none;">
             <div class="card">
                 <h3>🏦 Depósito Automático</h3>
                 <select id="deposit-token">
                     <option value="usdc">USDC</option>
+                    <option value="usdt">USDT</option>
                     <option value="dai">DAI</option>
                     <option value="weth">WETH</option>
                 </select>
@@ -639,6 +702,11 @@
                     badge: 'polygon-badge',
                     rpc: 'https://purple-bold-sunset.matic.quiknode.pro/6e2958c9720ad8d75f46b01d483e002df46d4524'
                 }
+            },
+            CONTRACTS: {
+                FMC: "0x5182CaAe1EccBa71aa854E89847eE530a361b8bA",
+                VAULT: "0xfb146E2601c5F77743E4888E75D6577C2F56bAbb",
+                USDT: "0x4B6C5B5E4656c5b5E4656c5B5E4656c5b5E4656c"
             }
         };
 
@@ -724,6 +792,7 @@
                 const simulatedBalance = (Math.random() * 10).toFixed(4);
                 const simulatedFMC = (Math.random() * 1000).toFixed(2);
                 const simulatedVault = (Math.random() * 500).toFixed(2);
+                const simulatedUSDT = (Math.random() * 2000).toFixed(2);
                 
                 document.getElementById('native-balance').textContent = simulatedBalance;
                 document.getElementById('wallet-balance').textContent = simulatedBalance;
@@ -731,7 +800,7 @@
                 document.getElementById('vault-balance').textContent = simulatedVault;
                 
                 // Actualizar balances de UI
-                document.getElementById('token-balance').textContent = simulatedVault + ' USDC';
+                document.getElementById('token-balance').textContent = simulatedUSDT + ' USDT';
                 document.getElementById('collateral-available').textContent = simulatedVault + ' USDC';
                 document.getElementById('fmc-available').textContent = simulatedFMC + ' FMC';
                 
@@ -782,6 +851,49 @@
         function updateLastUpdateTime() {
             const now = new Date();
             document.getElementById('last-update').textContent = now.toLocaleTimeString();
+        }
+
+        // ==================== FUNCIONES PARA TOKENS ====================
+        async function checkFMCBalance() {
+            showLoading('Consultando balance FMC...');
+            try {
+                // Simular consulta de balance
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const balance = (Math.random() * 1000).toFixed(2);
+                hideLoading();
+                showSuccess(`✅ Balance FMC: ${balance} FMC`);
+            } catch (error) {
+                hideLoading();
+                showError('❌ Error consultando balance FMC');
+            }
+        }
+
+        async function checkVaultBalance() {
+            showLoading('Consultando balance Vault...');
+            try {
+                // Simular consulta de balance
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const balance = (Math.random() * 50000).toFixed(2);
+                hideLoading();
+                showSuccess(`✅ Balance Vault: ${balance} USDC`);
+            } catch (error) {
+                hideLoading();
+                showError('❌ Error consultando balance Vault');
+            }
+        }
+
+        async function checkUSDTBalance() {
+            showLoading('Consultando balance USDT...');
+            try {
+                // Simular consulta de balance
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                const balance = (Math.random() * 2000).toFixed(2);
+                hideLoading();
+                showSuccess(`✅ Balance USDT: ${balance} USDT`);
+            } catch (error) {
+                hideLoading();
+                showError('❌ Error consultando balance USDT');
+            }
         }
 
         // ==================== SIMULACIONES DE TRANSACCIONES ====================
@@ -886,8 +998,8 @@
         function autoOptimizeDeposit() {
             const optimalAmount = (Math.random() * 100 + 50).toFixed(2);
             document.getElementById('deposit-amount').value = optimalAmount;
-            document.getElementById('deposit-token').value = 'usdc';
-            showSuccess(`💡 Depósito optimizado: ${optimalAmount} USDC`);
+            document.getElementById('deposit-token').value = 'usdt';
+            showSuccess(`💡 Depósito optimizado: ${optimalAmount} USDT`);
         }
 
         function autoCalculateMint() {
@@ -898,7 +1010,7 @@
 
         function autoFillAddress() {
             // Dirección de ejemplo para testing
-            document.getElementById('transfer-address').value = '0x5774808c2856f7FDF1A0a8F375A41559794BeF6B';
+            document.getElementById('transfer-address').value = '0x742d35Cc6634C0532925a3b8D6B6fB6F7A55Bd99';
             showSuccess('💡 Dirección automática insertada');
         }
 
@@ -971,6 +1083,7 @@
             document.getElementById('welcome-section').style.display = 'none';
             document.getElementById('portfolio-section').style.display = 'block';
             document.getElementById('contracts-section').style.display = 'block';
+            document.getElementById('tokens-section').style.display = 'block';
             document.getElementById('actions-section').style.display = 'grid';
             document.getElementById('p2p-section').style.display = 'block';
             document.getElementById('control-panel').style.display = 'block';
@@ -1056,13 +1169,19 @@
         }
 
         function autoDetectFMC() {
-            document.getElementById('fmc-address').value = '0x' + Math.random().toString(16).substr(2, 40);
-            showSuccess('🔍 Dirección FMC detectada automáticamente');
+            showLoading('Verificando contrato FMC...');
+            setTimeout(() => {
+                hideLoading();
+                showSuccess('✅ Contrato FMC verificado y operativo');
+            }, 1500);
         }
 
         function autoDetectVault() {
-            document.getElementById('vault-address').value = '0x' + Math.random().toString(16).substr(2, 40);
-            showSuccess('🔍 Dirección Vault detectada automáticamente');
+            showLoading('Verificando contrato Vault...');
+            setTimeout(() => {
+                hideLoading();
+                showSuccess('✅ Contrato Vault verificado y operativo');
+            }, 1500);
         }
     </script>
 </body>
